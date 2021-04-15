@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AccommodationService.Model;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,6 +16,13 @@ namespace AccommodationService.Controllers
     [ApiController]
     public class AccommodationsController : ControllerBase
     {
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public AccommodationsController(IWebHostEnvironment webHostEnvironment)
+        {
+            _webHostEnvironment = webHostEnvironment;
+        }
+
         // GET: <AccommodationsController>/status
         [HttpGet("status")]
         public string Status()
@@ -21,9 +32,17 @@ namespace AccommodationService.Controllers
 
         // GET: <AccommodationsController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<AirbnbListing> Get()
         {
-            return new string[] { "value1", "value2" };
+            
+            List<AirbnbListing> listings = new List<AirbnbListing>();
+            var dir = Path.Combine(_webHostEnvironment.ContentRootPath, "Json");
+            foreach(var file in Directory.GetFiles(dir))
+            {
+                var content = System.IO.File.ReadAllText(file);
+                listings.AddRange(JsonConvert.DeserializeObject<List<AirbnbListing>>(content));
+            }
+            return listings;
         }
 
         // GET <AccommodationsController>/5
