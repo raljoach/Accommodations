@@ -24,7 +24,7 @@
   <div class="box m-tags">
     <span><strong>{{selectedItems.length}}</strong> person selected</span>
     <div class="m-tags-items">
-      <a v-for="item in selectedItems" v-on:click="removeSelectedItem(item)" class="tag is-dark is-small">
+      <a v-for="item in selectedItems" v-bind:key="item" v-on:click="removeSelectedItem(item)" class="tag is-dark is-small">
         {{item.name}}
         <button class="delete is-small"></button>
       </a>
@@ -40,8 +40,8 @@
         </a>
       </li>
       <li class="is-space"></li>
-      <li v-for="item in pagination.filteredItems">
-        <a class="button" v-on:click="selectPage(item)" v-bind:class="{'is-info': item == pagination.currentPage}">{{item | numeral}}</a>
+      <li v-for="item in pagination.filteredItems" v-bind:key="item">
+        <a class="button" v-on:click="selectPage(item)" v-bind:class="{'is-info': item == pagination.currentPage}">{{ numeral(item) }}</a>
       </li>
       <li class="is-space"></li>
       <li>
@@ -61,7 +61,7 @@
         <th>Phone</th>
         <th></th>
       </tr>
-      <tr v-for="item in paginatedItems">
+      <tr v-for="item in paginatedItems" v-bind:key="item">
         <td>{{item.key}}</td>
         <td>{{item.name}}</td>
         <td>{{item.email}}</td>
@@ -74,6 +74,10 @@
 </template>
 
 <script>
+
+import chance from 'chance';
+import numeral from 'numeral';
+
 let items = []
 for(var i=0; i<20000; i++){
   items.push({
@@ -92,18 +96,20 @@ export default {
   props: {
     msg: String
   },
-  data: {
-    searchItem: '',
-    items: items,
-    filteredItems: [],
-    paginatedItems: [],
-    selectedItems: [],
-    pagination: {
-      range: 5,
-      currentPage: 1,
-      itemPerPage: 8,
-      items: [],
-      filteredItems: [],
+  data() {
+    return {
+        searchItem: '',
+        items: items,
+        filteredItems: [],
+        paginatedItems: [],
+        selectedItems: [],
+        pagination: {
+          range: 5,
+          currentPage: 1,
+          itemPerPage: 8,
+          items: [],
+          filteredItems: [],
+        }
     }
   },
   ready() {    
